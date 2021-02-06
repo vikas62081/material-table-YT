@@ -36,3 +36,15 @@
     transform: rotate(360deg);
   }
 }
+.active{
+  background-color: #6aec6a;
+  width:fit-content;
+  padding:0 5px;
+  border-radius: 2px;
+}
+.deactive{
+  background-color: #ec4f4f;
+  width:fit-content;
+  padding:0 5px;
+  border-radius: 2px;
+}
