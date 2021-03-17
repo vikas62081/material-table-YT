@@ -24,7 +24,7 @@ function App() {
   return (
     <div className="App">
       <h1 align="center">React-App</h1>
-      <h4 align='center'>Material Table with CRUD operation</h4>
+      <h4 align='center'>Material Table Bulk update</h4>
       <MaterialTable
         title="Employee Data"
         data={data}
@@ -54,6 +54,20 @@ function App() {
               setData(updatedRows)
               resolve()
             }, 2000)
+          }),
+          onBulkUpdate:selectedRows=>new Promise((resolve,reject)=>{
+            const rows=Object.values(selectedRows)
+            const updatedRows=[...data]
+            let index;
+            rows.map(emp=>{
+               index=emp.oldData.tableData.id
+               updatedRows[index]=emp.newData
+            })
+            setTimeout(()=>{
+              setData(updatedRows)
+              resolve()
+            },2000)
+          
           })
 
         }}
