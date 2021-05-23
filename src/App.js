@@ -1,43 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import './App.css';
 import MaterialTable from 'material-table'
-
+import {Link} from '@material-ui/core'
 const empList = [
-  { id: 1, name: "Neeraj", email: 'neeraj@gmail.com', status: 0, role: 1 },
-  { id: 2, name: "Raj", email: 'raj@gmail.com', status: 1, role: 0 },
-  { id: 3, name: "David", email: 'david342@gmail.com', status: 1, role: 3 },
-  { id: 4, name: "Vikas", email: 'vikas75@gmail.com', status: 0, role: 2 },
+  { id: 1, name: "Neeraj", email: 'neeraj@gmail.com', phone: 9876543210, },
+  { id: 2, name: "Raj", email: 'raj@gmail.com', phone: 6678901234 },
+  { id: 3, name: "David", email: 'david342@gmail.com', phone: 6312345678 },
+  { id: 4, name: "Vikas", email: 'vikas75@gmail.com', phone: 9787654321 },
 ]
-const empStatus=[
-  {id:0,title:'Deactive'},
-  {id:1,title:'Active'}
-]
-function App() {
 
-  const [data, setData] = useState(empList)
-  const [status,setStatus]=useState({})
+function App() {
   const columns = [
-    { title: "ID", field: "id" },
-    { title: "Name", field: "name" },
-    { title: "Email", field: "email" }, 
-    { title: "Status", field: 'status',lookup:status },
-    { title: "Role", field: "role",lookup:{0:"Associate",1:"Senior Associate",2:"Architect",3:"Manager"} }
-  ] 
-  useEffect(()=>{
-    const status={}
-empStatus.map(row=>status[row.id]=row.title)
-setStatus(status)
-  },[])
+  { title: "ID", field: "id",render:rowData=><Link href={`https://picsum.photos/1000?random=${rowData.id}`} target="_blank">{rowData.id}</Link> },
+    { title: "Name", field: "name",render:rowData=><Link href={`/user?id=${rowData.id}`} target="_blank">{rowData.name}</Link> },
+    { title: "Email", field: "email" },
+    { title: "Phone Number", field: 'phone' },
+    {title:"Profile",render:rowData=><Link href={`/user?id=${rowData.id}`} target="_blank">Profile</Link>}
+    ]   
 
   return (
     <div className="App">
       <h1 align="center">React-App</h1>
-      <h4 align='center'>Populate look up data from state</h4>
+      <h4 align='center'>Add hyperlink to column in Material Table</h4>
       <MaterialTable
         title="Employee Data"
-        data={data}
-        columns={columns}
-      />
+        data={empList}
+        columns={columns} />
     </div>
   );
 }
