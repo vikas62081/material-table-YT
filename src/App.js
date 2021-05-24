@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
-import MaterialTable from 'material-table'
-import { MuiThemeProvider, createMuiTheme, FormControlLabel, Switch } from '@material-ui/core'
+import MaterialTable, { MTableToolbar } from 'material-table'
+import { MuiThemeProvider, createMuiTheme, FormControlLabel, Switch, Grid, Typography, Divider } from '@material-ui/core'
 const empList = [
   { id: 1, name: "Neeraj", email: 'neeraj@gmail.com', phone: 9876543210, age: 23 },
   { id: 2, name: "Raj", email: 'raj@gmail.com', phone: 6678901234, age: 17 },
@@ -35,19 +35,32 @@ function App() {
   return (
     <div className="App">
       <h1 align="center">React-App</h1>
-      <h4 align='center'>Dark theme in Material Table</h4>
-      <FormControlLabel
-        value="top"
-        control={<Switch color="primary" checked={preferDarkMode} />}
-        onChange={handleDarkModeChange}
-        label="Dark Mode"
-        labelPlacement="top"
-      />
+      <h4 align='center'>Override toolbar component in Material Table</h4>
+
       <MuiThemeProvider theme={theme}>
         <MaterialTable
           title="Employee Data"
           data={empList}
           columns={columns}
+          components={{
+            Action: (props) => <FormControlLabel
+              value="top"
+              control={<Switch color="primary" checked={preferDarkMode} />}
+              onChange={handleDarkModeChange}
+              label="Dark Mode"
+              labelPlacement="top"
+            />,
+            Toolbar: (props) => <div>
+              <MTableToolbar {...props} />
+              <Grid style={{ padding: 15 }} align="right">
+                <Typography variant="subtitle2">Number of rows : {props.data.length}</Typography>
+              </Grid>
+              <Divider />
+            </div>
+          }}
+          actions={[
+            { isFreeAction: true }
+          ]}
         />
       </MuiThemeProvider>
     </div>
