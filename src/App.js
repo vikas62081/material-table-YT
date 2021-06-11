@@ -1,73 +1,51 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './App.css';
-import MaterialTable from 'material-table'
-import { CsvBuilder } from 'filefy';
-import SaveAltIcon from '@material-ui/icons/SaveAlt';
+import { Grid, TextField, Button, Card, CardContent, Typography } from '@material-ui/core';
 
-const empList = [
-  { id: 1, name: "Neeraj", email: 'neeraj@gmail.com', phone: 9876543210, age: 23, year: 2019 },
-  { id: 2, name: "Raj", email: 'raj@gmail.com', phone: 6678901234, age: 17, year: 2020 },
-  { id: 3, name: "David", email: 'david342@gmail.com', phone: 6312345678, age: 34, year: 2019 },
-  { id: 4, name: "Vikas", email: 'vikas75@gmail.com', phone: 9787654321, age: 20, year: 2021 },
-  { id: 1, name: "Neeraj", email: 'neeraj@gmail.com', phone: 9876543210, age: 23, year: 2019 },
-  { id: 2, name: "Raj", email: 'raj@gmail.com', phone: 6678901234, age: 17, year: 2020 },
-  { id: 3, name: "David", email: 'david342@gmail.com', phone: 6312345678, age: 34, year: 2019 },
-  { id: 4, name: "Vikas", email: 'vikas75@gmail.com', phone: 9787654321, age: 20, year: 2021 },
-  { id: 1, name: "Neeraj", email: 'neeraj@gmail.com', phone: 9876543210, age: 23, year: 2019 },
-  { id: 2, name: "Raj", email: 'raj@gmail.com', phone: 6678901234, age: 17, year: 2020 },
-  { id: 3, name: "David", email: 'david342@gmail.com', phone: 6312345678, age: 34, year: 2019 },
-  { id: 4, name: "Vikas", email: 'vikas75@gmail.com', phone: 9787654321, age: 20, year: 2021 },
-]
 
 function App() {
 
-  const [tableData, setTableData] = useState(empList)
-  const [selectedRows, setSelectedRows] = useState([])
-  const columns = [
-    { title: "ID", field: "id" },
-    { title: "Name", field: "name" },
-    { title: "Email", field: "email" },
-    { title: "Phone Number", field: 'phone' },
-    { title: "Age", field: 'age' },
-    { title: "Joining Year", field: 'year' }
-  ]
-  const handleBulkDelete = () => {
-    const updatedData = tableData.filter(row => !selectedRows.includes(row))
-    setTableData(updatedData)
-  }
-const exportAllSelectedRows=()=>{
-  
 
- new CsvBuilder("tableData.csv")
-  .setColumns(columns.map(col=>col.title))
-  .addRows(selectedRows.map(rowData=>columns.map(col=>rowData[col.field])))
-  .exportFile();
-
-}
   return (
-    <div className="App">
-      <h1 align="center">React-App</h1>
-      <h4 align='center'>Export Selected Rows only in Material Table</h4>
-      <MaterialTable
-        title="Employee Data"
-        data={tableData}
-        columns={columns}
-        onSelectionChange={(rows) => setSelectedRows(rows)}
-        options={{ selection: true,exportButton:true,exportAllData:true}}
-        actions={[
-          {
-            icon: 'delete',
-            tooltip: "Delete all selected rows",
-            onClick: () => handleBulkDelete()
-          },
-          {
-            icon: ()=><SaveAltIcon/>,
-            tooltip: "Export all selected rows",
-            onClick: () => exportAllSelectedRows()
-          }
+    <div className="App"> 
+      <Typography gutterBottom variant="h3" align="center">
+        React-App
+       </Typography>
+      <Grid>
+        <Card style={{ maxWidth: 450, padding: "20px 5px", margin: "0 auto" }}>
+          <CardContent>
+            <Typography gutterBottom variant="h5">
+              Contact Us
+          </Typography> 
+            <Typography variant="body2" color="textSecondary" component="p" gutterBottom>
+              Fill up the form and our team will get back to you within 24 hours.
+          </Typography> 
+            <form>
+              <Grid container spacing={1}>
+                <Grid xs={12} sm={6} item>
+                  <TextField placeholder="Enter first name" label="First Name" variant="outlined" fullWidth required />
+                </Grid>
+                <Grid xs={12} sm={6} item>
+                  <TextField placeholder="Enter last name" label="Last Name" variant="outlined" fullWidth required />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField type="email" placeholder="Enter email" label="Email" variant="outlined" fullWidth required />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField type="number" placeholder="Enter phone number" label="Phone" variant="outlined" fullWidth required />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField label="Message" multiline rows={4} placeholder="Type your message here" variant="outlined" fullWidth required />
+                </Grid>
+                <Grid item xs={12}>
+                  <Button type="submit" variant="contained" color="primary" fullWidth>Submit</Button>
+                </Grid>
 
-        ]}
-      />
+              </Grid>
+            </form>
+          </CardContent>
+        </Card>
+      </Grid>
     </div>
   );
 }
