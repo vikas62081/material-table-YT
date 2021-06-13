@@ -1,38 +1,51 @@
 import React from 'react';
-import './App.css';
-import MaterialTable from 'material-table'
+import './App.css'
+import { Grid, TextField, Button, Card, CardContent, Typography } from '@material-ui/core';
+import { inputFormElements } from './formElments'
 
-const empList = [
-  { id: 1, name: "Neeraj", email: 'neeraj@gmail.com', phone: 9876543210, age: 23, year: 2019 },
-  { id: 2, name: "Raj", email: 'raj@gmail.com', phone: 6678901234, age: 17, year: 2020 },
-  { id: 3, name: "David", email: 'david342@gmail.com', phone: 6312345678, age: 34, year: 2019 },
-  { id: 4, name: "Vikas", email: 'vikas75@gmail.com', phone: 9787654321, age: 20, year: 2021 },
-  {id: 5, name: "Rajesh", email: 'rajesh12@gmail.com', phone: 8456107123, age: 25, year: 2015, }
-  
-]
+export default function App() {
 
-function App() {
-  const columns = [
-    { title: "ID", field: "id" },
-    { title: "Name", field: "name" },
-    { title: "Email", field: "email" },
-    { title: "Phone Number", field: 'phone' },
-    { title: "Age", field: 'age' },
-    { title: "Joining Year", field: 'year' }
-  ]
-
+  const margin = { margin: "0 5px" }
   return (
-    <div className="App">
-      <h1 align="center">React-App</h1>
-      <h4 align='center'>Show and Hide Columns in Material Table</h4>
-      <MaterialTable
-        title="Employee Data"
-        data={empList}
-        columns={columns}
-        options={{columnsButton:true}}
-         />
-    </div> 
+    <div className='App'>
+      <Grid style={{ padding: "80px 5px 0 5px" }}>
+        <Card style={{ maxWidth: 600, margin: "0 auto" }}>
+          <CardContent>
+            <Typography variant="h4" color="primary" >
+              Create an Account
+          </Typography>
+            <Typography variant="subtitle1" color="textSecondary" >
+              Fill all the mandatory fields to create an account.
+          </Typography>
+            <form>
+              <Typography variant="body2" align="left" gutterBottom>Personal Info : </Typography>
+              <Grid container spacing={1}>
+                {
+                  inputFormElements.slice(0, 4).map(input => <Grid xs={input.xs} sm={input.sm} item>
+                    <TextField {...input} />
+                  </Grid>)
+                }
+              </Grid>
+              <Typography variant="body2" align="left" gutterBottom>Address : </Typography>
+              <Grid container spacing={1}>
+                {
+                  inputFormElements.slice(4, 9).map(input => <Grid xs={input.xs} sm={input.sm} item>
+                    <TextField {...input} />
+                  </Grid>)
+                }
+              </Grid>
+              <Grid container spacing={1}>
+                <Grid item xs={12} align="right">
+                  <Button style={margin} type="reset" variant="outlined" color="primary">Reset</Button>
+                  <Button type="submit" variant="contained" color="primary">Submit</Button>
+                </Grid>
+
+              </Grid>
+            </form>
+
+          </CardContent>
+        </Card>
+      </Grid>
+    </div>
   );
 }
-
-export default App;

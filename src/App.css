@@ -1,6 +1,16 @@
 .App {
-  /* text-align: center; */
+  text-align: center;
+  position: relative;
+  font-family: sans-serif;
+  width: 100vw;
+  min-height: 100vh;
+  background-image: url("https://images.unsplash.com/photo-1554303867-f61340bb2cf5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1534&q=80");
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
+  z-index: 1;
 }
+
 
 .App-logo {
   height: 40vmin;
