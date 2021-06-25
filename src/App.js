@@ -1,102 +1,63 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './App.css';
 import MaterialTable from 'material-table'
 
-const empList = [
-  { id: 1, name: "Neeraj", email: 'neeraj@gmail.com', phone: 9876543210, city: "Bangalore", status: 0 },
-  { id: 2, name: "Raj", email: 'raj@gmail.com', phone: 9812345678, city: "Chennai" },
-  { id: 3, name: "David", email: 'david342@gmail.com', phone: 7896536289, city: "Jaipur" },
-  { id: 4, name: "Vikas", email: 'vikas75@gmail.com', phone: 9087654321, city: "Hyderabad" },
-]
 
 function App() {
-
-  const [data, setData] = useState(empList)
   const columns = [
-    { title: "ID", field: "id", editable: false },
-    {
-      title: "Name", field: "name", validate: rowData => {
-        if (rowData.name === undefined || rowData.name === "") {
-          return "Required"
-        } else if (rowData.name.length < 3) {
-          return "Name should contains atleast 3 chars"
-        }
-        return true
-      }
-    },
-    {
-      title: "Email", field: "email", validate: rowData => {
-        if (rowData.email === undefined || rowData.email === "") {
-          return "Required"
-        } else if (!rowData.email.includes('@' && '.')) {
-          return "Enter valid email address"
-        }
-        return true
-      }
-    },
-    {
-      title: "Phone Number", field: 'phone', validate: rowData => {
-        if (rowData.phone === undefined || rowData.phone === "") {
-          return "Required"
-        } else if (rowData.phone.length < 10 || rowData.phone.length > 10) {
-          return "Phone number should contains 10 digits"
-          //  return {isValid:false,helperText:"Phone number should contains 10 digits"}
-        }
-        return true
-      }
-    },
-    { title: "City", field: "city", validate: rowData => ({ isValid: true, helperText: "Optional" }) },
-    {
-      title: "Status", field: 'status', lookup: { 0: "Inactive", 1: "Active" }, validate: rowData => {
-        if (rowData.status === undefined || rowData.status === "") {
-          return "Required"
-        }
-        return true
-      }
-    }
-
+    { title: "Athlete", field: "athlete" },
+    { title: "Age", field: "age" },
+    { title: "Country", field: "country" },
+    { title: "Year", field: "year" },
+    { title: "Date", field: 'date' },
+    { title: "Sport", field: 'sport' },
+    { title: "Gold", field: 'gold' },
+    { title: "Silver", field: 'silver' },
+    { title: "Bronze", field: 'bronze' },
+    { title: "Total", field: 'total' },
   ]
-
 
   return (
     <div className="App">
       <h1 align="center">React-App</h1>
-      <h4 align='center'>CRUD operation in Material Table with Proper Validation</h4>
+      <h4 align='center'>Implement Server-Side Pagination, Filter, Search and Sorting in Material Table</h4>
       <MaterialTable
-        title="Employee Data"
-        data={data}
+        title="Olympic Data"
         columns={columns}
-        editable={{
-          onRowAdd: (newRow) => new Promise((resolve, reject) => {
-            const updatedRows = [...data, { id: Math.floor(Math.random() * 100), ...newRow }]
-            setTimeout(() => {
-              setData(updatedRows)
-              resolve()
-            }, 2000)
-          }),
-          onRowDelete: selectedRow => new Promise((resolve, reject) => {
-            const index = selectedRow.tableData.id;
-            const updatedRows = [...data]
-            updatedRows.splice(index, 1)
-            setTimeout(() => {
-              setData(updatedRows)
-              resolve()
-            }, 2000)
-          }),
-          onRowUpdate: (updatedRow, oldRow) => new Promise((resolve, reject) => {
-            const index = oldRow.tableData.id;
-            const updatedRows = [...data]
-            updatedRows[index] = updatedRow
-            setTimeout(() => {
-              setData(updatedRows)
-              resolve()
-            }, 2000)
-          })
+        options={{ debounceInterval: 700, padding: "dense", filtering: true }}
+        data={query =>
+          new Promise((resolve, reject) => {
+            // prepare your data and then call resolve like this:
+            let url = 'http://localhost:3002/olympic?'
+            //searching
+            if (query.search) {
+              url += `q=${query.search}`
+            }
+            //sorting 
+            if (query.orderBy) {
+              url += `&_sort=${query.orderBy.field}&_order=${query.orderDirection}`
+            }
+            //filtering
+            if (query.filters.length) {
+              const filter = query.filters.map(filter => {
+                return `&${filter.column.field}${filter.operator}${filter.value}`
+              })
+              url += filter.join('')
+            }
+            //pagination
+            url += `&_page=${query.page + 1}`
+            url += `&_limit=${query.pageSize}`
 
-        }}
-        options={{
-          actionsColumnIndex: -1, addRowPosition: "first"
-        }}
+            fetch(url).then(resp => resp.json()).then(resp => {
+              resolve({
+                data: resp,// your data array
+                page: query.page,// current page number
+                totalCount: 499// total row number
+              });
+            })
+
+          })
+        }
       />
     </div>
   );
