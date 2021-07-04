@@ -1,63 +1,86 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import MaterialTable from 'material-table'
 
 
 function App() {
-  const columns = [
-    { title: "Athlete", field: "athlete" },
-    { title: "Age", field: "age" },
-    { title: "Country", field: "country" },
-    { title: "Year", field: "year" },
-    { title: "Date", field: 'date' },
-    { title: "Sport", field: 'sport' },
-    { title: "Gold", field: 'gold' },
-    { title: "Silver", field: 'silver' },
-    { title: "Bronze", field: 'bronze' },
-    { title: "Total", field: 'total' },
-  ]
+  const url = "http://localhost:4000/students"
+  const [data, setData] = useState([])
+  useEffect(() => {
+    getStudents()
+  }, [])
 
+  const getStudents = () => {
+    fetch(url).then(resp => resp.json())
+      .then(resp => setData(resp))
+  }
+  const columns = [
+    { title: "Name", field: "name", validate: rowData => rowData.name === undefined || rowData.name === "" ? "Required" : true },
+    {
+      title: "Email", field: "email",
+      validate: rowData => rowData.email === undefined || rowData.email === "" ? "Required" : true
+    },
+    {
+      title: "Year", field: "year",
+      validate: rowData => rowData.year === undefined || rowData.year === "" ? "Required" : true
+    },
+    {
+      title: "Fee", field: 'fee',
+      validate: rowData => rowData.fee === undefined || rowData.fee === "" ? "Required" : true
+    }]
   return (
     <div className="App">
       <h1 align="center">React-App</h1>
-      <h4 align='center'>Implement Server-Side Pagination, Filter, Search and Sorting in Material Table</h4>
+      <h4 align='center'>CRUD operation with Json-Server (with Validation) in Material Table</h4>
       <MaterialTable
-        title="Olympic Data"
+        title="Student Details"
         columns={columns}
-        options={{ debounceInterval: 700, padding: "dense", filtering: true }}
-        data={query =>
-          new Promise((resolve, reject) => {
-            // prepare your data and then call resolve like this:
-            let url = 'http://localhost:3002/olympic?'
-            //searching
-            if (query.search) {
-              url += `q=${query.search}`
-            }
-            //sorting 
-            if (query.orderBy) {
-              url += `&_sort=${query.orderBy.field}&_order=${query.orderDirection}`
-            }
-            //filtering
-            if (query.filters.length) {
-              const filter = query.filters.map(filter => {
-                return `&${filter.column.field}${filter.operator}${filter.value}`
+        data={data}
+        options={{ actionsColumnIndex: -1, addRowPosition: "first" }}
+        editable={{
+          onRowAdd: (newData) => new Promise((resolve, reject) => {
+            //Backend call
+            fetch(url, {
+              method: "POST",
+              headers: {
+                'Content-type': "application/json"
+              },
+              body: JSON.stringify(newData)
+            }).then(resp => resp.json())
+              .then(resp => {
+                getStudents()
+                resolve()
               })
-              url += filter.join('')
-            }
-            //pagination
-            url += `&_page=${query.page + 1}`
-            url += `&_limit=${query.pageSize}`
+          }),
+          onRowUpdate: (newData, oldData) => new Promise((resolve, reject) => {
+            //Backend call
+            fetch(url + "/" + oldData.id, {
+              method: "PUT",
+              headers: {
+                'Content-type': "application/json"
+              },
+              body: JSON.stringify(newData)
+            }).then(resp => resp.json())
+              .then(resp => {
+                getStudents()
+                resolve()
+              })
+          }),
+          onRowDelete: (oldData) => new Promise((resolve, reject) => {
+            //Backend call
+            fetch(url + "/" + oldData.id, {
+              method: "DELETE",
+              headers: {
+                'Content-type': "application/json"
+              },
 
-            fetch(url).then(resp => resp.json()).then(resp => {
-              resolve({
-                data: resp,// your data array
-                page: query.page,// current page number
-                totalCount: 499// total row number
-              });
-            })
-
+            }).then(resp => resp.json())
+              .then(resp => {
+                getStudents()
+                resolve()
+              })
           })
-        }
+        }}
       />
     </div>
   );
