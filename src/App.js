@@ -1,87 +1,70 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import './App.css';
 import MaterialTable from 'material-table'
+import XLSX from 'xlsx'
+const studentData = [
+  {
+    id: 1,
+    name: "Neeraj",
+    email: "neeraj@gmail.com",
+    year: 2015,
+    fee: 167000,
+  },
+  {
+    id: 2,
+    name: "Vikas",
+    email: "vikas@gmail.com",
+    year: 2013,
+    fee: 785462,
+  },
 
-
-function App() {
-  const url = "http://localhost:4000/students"
-  const [data, setData] = useState([])
-  useEffect(() => {
-    getStudents()
-  }, [])
-
-  const getStudents = () => {
-    fetch(url).then(resp => resp.json())
-      .then(resp => setData(resp))
+  {
+    id: 3,
+    name: "Rahul",
+    email: "rahul@gmail.com",
+    year: 2020,
+    fee: 784596,
   }
+]
+function App() {
   const columns = [
-    { title: "Name", field: "name", validate: rowData => rowData.name === undefined || rowData.name === "" ? "Required" : true },
-    {
-      title: "Email", field: "email",
-      validate: rowData => rowData.email === undefined || rowData.email === "" ? "Required" : true
-    },
-    {
-      title: "Year", field: "year",
-      validate: rowData => rowData.year === undefined || rowData.year === "" ? "Required" : true
-    },
-    {
-      title: "Fee", field: 'fee',
-      validate: rowData => rowData.fee === undefined || rowData.fee === "" ? "Required" : true
-    }]
+    { title: "Name", field: "name", },
+    { title: "Email", field: "email", },
+    { title: "Year", field: "year",type:"numeric" },
+    { title: "Fee", field: 'fee',type:"currency" }]
+
+    const downloadExcel=()=>{
+      const newData=studentData.map(row=>{
+        delete row.tableData
+        return row
+      })
+      const workSheet=XLSX.utils.json_to_sheet(newData)
+      const workBook=XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workBook,workSheet,"students")
+      //Buffer
+      let buf=XLSX.write(workBook,{bookType:"xlsx",type:"buffer"})
+      //Binary string
+      XLSX.write(workBook,{bookType:"xlsx",type:"binary"})
+      //Download
+      XLSX.writeFile(workBook,"StudentsData.xlsx")
+
+
+    }
   return (
     <div className="App">
       <h1 align="center">React-App</h1>
-      <h4 align='center'>CRUD operation with Json-Server (with Validation) in Material Table</h4>
+      <h4 align='center'>Export Data to Excel in Material Table</h4>
       <MaterialTable
         title="Student Details"
         columns={columns}
-        data={data}
-        options={{ actionsColumnIndex: -1, addRowPosition: "first" }}
-        editable={{
-          onRowAdd: (newData) => new Promise((resolve, reject) => {
-            //Backend call
-            fetch(url, {
-              method: "POST",
-              headers: {
-                'Content-type': "application/json"
-              },
-              body: JSON.stringify(newData)
-            }).then(resp => resp.json())
-              .then(resp => {
-                getStudents()
-                resolve()
-              })
-          }),
-          onRowUpdate: (newData, oldData) => new Promise((resolve, reject) => {
-            //Backend call
-            fetch(url + "/" + oldData.id, {
-              method: "PUT",
-              headers: {
-                'Content-type': "application/json"
-              },
-              body: JSON.stringify(newData)
-            }).then(resp => resp.json())
-              .then(resp => {
-                getStudents()
-                resolve()
-              })
-          }),
-          onRowDelete: (oldData) => new Promise((resolve, reject) => {
-            //Backend call
-            fetch(url + "/" + oldData.id, {
-              method: "DELETE",
-              headers: {
-                'Content-type': "application/json"
-              },
-
-            }).then(resp => resp.json())
-              .then(resp => {
-                getStudents()
-                resolve()
-              })
-          })
-        }}
-      />
+        data={studentData}
+        actions={[
+          {icon:()=><button>Export</button>,// you can pass icon too
+          tooltip:"Export to Excel",
+        onClick:()=>downloadExcel(),
+      isFreeAction:true}
+        ]}
+        />
     </div>
   );
 }
