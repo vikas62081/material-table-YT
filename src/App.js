@@ -1,94 +1,75 @@
-import React from 'react';
-import './App.css';
-import MaterialTable from 'material-table'
-import XLSX from 'xlsx'
-import PrintIcon from '@material-ui/icons/Print'
-import jsPDF from 'jspdf'
-import 'jspdf-autotable'
-const studentData = [
-  {
-    id: 1,
-    name: "Neeraj",
-    email: "neeraj@gmail.com",
-    year: 2015,
-    fee: 167000,
-  },
-  {
-    id: 2,
-    name: "Vikas",
-    email: "vikas@gmail.com",
-    year: 2013,
-    fee: 785462,
-  },
+import React, { useState } from 'react'
+import { AgGridColumn, AgGridReact } from 'ag-grid-react';
+import 'ag-grid-enterprise';
+import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
-  {
-    id: 3,
-    name: "Rahul",
-    email: "rahul@gmail.com",
-    year: 2020,
-    fee: 784596,
-  }
-]
-function App() {
+const App = () => {
+  const [gridApi, setGridApi] = useState(null);
+  const [rowData, setRowData] = useState([])
+
   const columns = [
-    { title: "Name", field: "name", },
-    { title: "Email", field: "email", },
-    { title: "Year", field: "year", type: "numeric" },
-    { title: "Fee", field: 'fee', type: "currency" }]
+    { title: "Athlete", field: "athlete", filter: "agTextColumnFilter" },
+    { headerName: "Age", field: "age", filter: "agTextColumnFilter" },
+    { title: "Country", field: "country",filter: "agTextColumnFilter" },
+    { title: "Year", field: "year",filter: 'agNumberColumnFilter', },
+    { title: "Date", field: 'date',filter: 'agDateColumnFilter',  },
+    { title: "Sport", field: 'sport',filter: 'agTextColumnFilter', },
+    { title: "Gold", field: 'gold', filter: 'agNumberColumnFilter', },
+    { title: "Silver", field: 'silver',filter: 'agNumberColumnFilter',  },
+    { title: "Bronze", field: 'bronze',filter: 'agNumberColumnFilter',  },
+    { title: "Total", field: 'total',filter: 'agNumberColumnFilter',  },
+  ]
 
-  const downloadExcel = () => {
-    const newData = studentData.map(row => {
-      delete row.tableData
-      return row
-    })
-    const workSheet = XLSX.utils.json_to_sheet(newData)
-    const workBook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workBook, workSheet, "students")
-    //Buffer
-    XLSX.write(workBook, { bookType: "xlsx", type: "buffer" })
-    //Binary string
-    XLSX.write(workBook, { bookType: "xlsx", type: "binary" })
-    //Download
-    XLSX.writeFile(workBook, "StudentsData.xlsx")
+  const onGridReady = (params) => {
+    setGridApi(params);
+    const datasource = {
+      getRows(params) {
+        console.log(params.request)
+        const { startRow, endRow, sortModel, filterModel } = params.request
+        let url = `http://localhost:4000/olympic?`
+        if (sortModel.length) {
+          const { colId, sort } = sortModel[0]
+          url += `_sort=${colId}&_order=${sort}&`
+        }
+        const filtersKey = Object.keys(filterModel)
+        if (filtersKey.length) {
+          filtersKey.map(filter => {
+            url += `${filter}=${filterModel[filter].filter}&`
+          })
+        }
 
+        url += `_start=${startRow}&_end=${endRow}}`
+        fetch(url)
+          .then(httpResponse => httpResponse.json())
+          .then(response => {
+            params.successCallback(response, 499);
+          })
+          .catch(error => {
+            console.error(error);
+            params.failCallback();
+          })
+      }
+    };
 
-  }
-  const downloadPdf = () => {
-    const doc = new jsPDF()
-    doc.text("Student Details", 20, 10)
-    doc.autoTable({
-      theme: "grid",
-      columns: columns.map(col => ({ ...col, dataKey: col.field })),
-      body: studentData
-    })
-    doc.save('table.pdf')
+    params.api.setServerSideDatasource(datasource);
   }
 
   return (
-    <div className="App">
-      <h1 align="center">React-App</h1>
-      <h4 align='center'>Export Data to Pdf in Material Table</h4>
-      <MaterialTable
-        title="Student Details"
-        columns={columns}
-        data={studentData}
-        actions={[
-          {
-            icon: () => <button>Export</button>,// you can pass icon too
-            tooltip: "Export to Excel",
-            onClick: () => downloadExcel(),
-            isFreeAction: true
-          },
-          {
-            icon: () => <PrintIcon />,// you can pass icon too
-            tooltip: "Export to Pdf",
-            onClick: () => downloadPdf(),
-            isFreeAction: true
-          }
-        ]}
-      />
+    <div className="ag-theme-alpine" style={{ height: 600, }}>
+      <h1>React-App</h1>
+      <AgGridReact
+        //  rowData={rowData} 
+        pagination={true}
+        // paginationPageSize={10}
+        columnDefs={columns}
+        rowModelType={'serverSide'}
+        autoHeight={true}
+        animateRows={true}
+        onGridReady={onGridReady}
+        defaultColDef={{ floatingFilter: true, filter: true, sortable: true }} />
+
     </div>
   );
-}
-
-export default App;
+};
+export default App
