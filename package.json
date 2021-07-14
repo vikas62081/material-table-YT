@@ -12,10 +12,13 @@
     "ag-grid-enterprise": "^23.2.0",
     "ag-grid-react": "^23.2.0",
     "axios": "^0.19.2",
+    "jspdf": "^2.3.1",
+    "jspdf-autotable": "^3.5.15",
     "material-table": "^1.69.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
+    "txt-file-to-json": "^3.0.6",
     "xlsx": "^0.17.0"
   },
   "scripts": {
