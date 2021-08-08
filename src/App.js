@@ -1,91 +1,92 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import MaterialTable from 'material-table'
-import { CsvBuilder } from 'filefy';
-import SaveAltIcon from '@material-ui/icons/SaveAlt';
-
-const empList = [
-  { id: 1, name: "Neeraj", email: 'neeraj@gmail.com', phone: 9876543210, age: 23, year: 2019 },
-  { id: 2, name: "Raj", email: 'raj@gmail.com', phone: 6678901234, age: 17, year: 2020 },
-  { id: 3, name: "David", email: 'david342@gmail.com', phone: 6312345678, age: 34, year: 2019 },
-  { id: 4, name: "Vikas", email: 'vikas75@gmail.com', phone: 9787654321, age: 20, year: 2021 },
-  { id: 5, name: "Neeraj", email: 'neeraj@gmail.com', phone: 9876543210, age: 23, year: 2019 },
-  { id: 6, name: "Raj", email: 'raj@gmail.com', phone: 6678901234, age: 17, year: 2020 },
-]
+import GetAppIcon from '@material-ui/icons/GetApp';
+import AddIcon from '@material-ui/icons/Add';
 
 function App() {
-  const tableRef = useRef(null)
-  const [allChecked, setAllChecked] = useState(true)
-  const [tableData, setTableData] = useState(empList)
-  const [selectedRows, setSelectedRows] = useState([])
+  const [tableData, setTableData] = useState([
+    { name: "Raj", email: "Raj@gmail.com", phone: 7894561230, age: null, gender: "M", city: "Chennai", fee: 78456 },
+    { name: "Mohan", email: "mohan@gmail.com", phone: 7845621590, age: 35, gender: "M", city: "Delhi", fee: 456125 },
+    { name: "Sweety", email: "sweety@gmail.com", phone: 741852912, age: 17, gender: "F", city: "Noida", fee: 458796 },
+    { name: "Vikas", email: "vikas@gmail.com", phone: 9876543210, age: 20, gender: "M", city: "Mumbai", fee: 874569 },
+    { name: "Neha", email: "neha@gmail.com", phone: 7845621301, age: 25, gender: "F", city: "Patna", fee: 748521 },
+    { name: "Mohan", email: "mohan@gmail.com", phone: 7845621590, age: 35, gender: "M", city: "Delhi", fee: 456125 },
+    { name: "Sweety", email: "sweety@gmail.com", phone: 741852912, age: 17, gender: "F", city: "Noida", fee: 458796 },
+    { name: "Vikas", email: "vikas@gmail.com", phone: 9876543210, age: 20, gender: "M", city: "Mumbai", fee: 874569 },
+    { name: "Raj", email: "Raj@gmail.com", phone: 7894561230, age: null, gender: "M", city: "Chennai", fee: 78456 },
+    { name: "Mohan", email: "mohan@gmail.com", phone: 7845621590, age: 35, gender: "M", city: "Delhi", fee: 456125 },
+    { name: "Sweety", email: "sweety@gmail.com", phone: 741852912, age: 17, gender: "F", city: "Noida", fee: 458796 },
+    { name: "Vikas", email: "vikas@gmail.com", phone: 9876543210, age: 20, gender: "M", city: "Mumbai", fee: 874569 },
+  ])
   const columns = [
-    { title: "ID", field: "id" },
-    { title: "Name", field: "name" },
-    { title: "Email", field: "email" },
-    { title: "Phone Number", field: 'phone' },
-    { title: "Age", field: 'age' },
-    { title: "Joining Year", field: 'year' }
+    { title: "Name", field: "name", sorting: false, filtering: false, cellStyle: { background:"#009688" }, headerStyle: { color: "#fff" } },
+    { title: "Email", field: "email", filterPlaceholder: "filter" },
+    { title: "Phone Number", field: "phone", align: "center", grouping: false },
+    {
+      title: "Age", field: "age", emptyValue: () => <em>null</em>,
+      render: (rowData) => <div style={{ background: rowData.age >= 18 ? "#008000aa" : "#f90000aa",borderRadius:"4px",paddingLeft:5 }}>{rowData.age >= 18 ? "18+" : "18-"}</div>,
+       searchable: false, export: false
+    },
+    { title: "Gender", field: "gender", lookup: { M: "Male", F: "Female" } },
+    { title: "City", field: "city",filterPlaceholder:"filter" },
+    { title: "School Fee", field: "fee", type: "currency", currencySetting: { currencyCode: "INR", minimumFractionDigits: 1 },
+    cellStyle: { background:"#009688" }, headerStyle: { color: "#fff" } },
   ]
-  const handleBulkDelete = () => {
-    const updatedData = tableData.filter(row => !selectedRows.includes(row))
-    setTableData(updatedData)
-  }
-  const exportAllSelectedRows = () => {
-
-
-    new CsvBuilder("tableData.csv")
-      .setColumns(columns.map(col => col.title))
-      .addRows(selectedRows.map(rowData => columns.map(col => rowData[col.field])))
-      .exportFile();
-
-  }
-  const handleSelectionChange = (rows) => {
-    setAllChecked(true)
-    const { pagedData, pageSize, data } = tableRef.current.dataManager
-    let selectedRows = rows
-    if (rows.length == data.length && allChecked) {
-      let c = []
-      setTableData(preData => preData.map(p => {
-        if (pagedData.find(pg => pg.id == p.id)) {
-          c.push(p)
-          return p
-        }
-        return { ...p, tableData: { ...p.tableData, checked: false } }
-      }))
-      selectedRows = c
-      setAllChecked(false)
-    }
-
-    console.log(selectedRows)
-
-  }
   return (
     <div className="App">
       <h1 align="center">React-App</h1>
-      <h4 align='center'>Export Selected Rows only in Material Table</h4>
-      <MaterialTable
-        title="Employee Data"
-        data={tableData}
-        tableRef={tableRef}
-        columns={columns}
-        onSelectionChange={(rows) => handleSelectionChange(rows)}
-        options={{ selection: true, exportButton: true, exportAllData: true }}
+      <h4 align='center'>Crash Course on Material Table </h4>
+
+      <MaterialTable columns={columns} data={tableData}
+        editable={{
+          onRowAdd: (newRow) => new Promise((resolve, reject) => {
+            setTableData([...tableData, newRow])
+
+            setTimeout(() => resolve(), 500)
+          }),
+          onRowUpdate: (newRow, oldRow) => new Promise((resolve, reject) => {
+            const updatedData = [...tableData]
+            updatedData[oldRow.tableData.id] = newRow
+            setTableData(updatedData)
+            setTimeout(() => resolve(), 500)
+          }),
+          onRowDelete: (selectedRow) => new Promise((resolve, reject) => {
+            const updatedData = [...tableData]
+            updatedData.splice(selectedRow.tableData.id, 1)
+            setTableData(updatedData)
+            setTimeout(() => resolve(), 1000)
+
+          })
+        }}
         actions={[
           {
-            icon: 'delete',
-            tooltip: "Delete all selected rows",
-            onClick: () => handleBulkDelete()
-          },
-          {
-            icon: () => <SaveAltIcon />,
-            tooltip: "Export all selected rows",
-            onClick: () => exportAllSelectedRows()
+            icon: () => <GetAppIcon />,
+            tooltip: "Click me",
+            onClick: (e, data) => console.log(data),
+            // isFreeAction:true
           }
-
         ]}
-      />
+        onSelectionChange={(selectedRows) => console.log(selectedRows)}
+        options={{
+          sorting: true, search: true,
+          searchFieldAlignment: "right", searchAutoFocus: true, searchFieldVariant: "standard",
+          filtering: true, paging: true, pageSizeOptions: [2, 5, 10, 20, 25, 50, 100], pageSize: 5,
+          paginationType: "stepped", showFirstLastPageButtons: false, paginationPosition: "both", exportButton: true,
+          exportAllData: true, exportFileName: "TableData", addRowPosition: "first", actionsColumnIndex: -1, selection: true,
+          showSelectAllCheckbox: false, showTextRowsSelected: false, selectionProps: rowData => ({
+            disabled: rowData.age == null,
+            // color:"primary"
+          }),
+          grouping: true, columnsButton: true,
+          rowStyle: (data, index) => index % 2 === 0 ? { background: "#f5f5f5" } : null,
+          headerStyle: { background: "#f44336",color:"#fff"}
+        }}
+        title="Student Information"
+        icons={{ Add: () => <AddIcon /> }} />
+        <h2>hh</h2>
     </div>
   );
 }
- 
+
 export default App;
