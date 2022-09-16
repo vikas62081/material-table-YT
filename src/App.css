@@ -36,3 +36,9 @@
     transform: rotate(360deg);
   }
 }
+
+.MuiPaper-root .MTableToolbar-highlight-6 {
+  background-color: #58e1f8;
+  color: black;
+}
+  
