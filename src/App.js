@@ -4,7 +4,10 @@ import MaterialTable from "material-table";
 
 function App() {
   const [data, setData] = useState([]);
-  const [selectedRow, setSelectedRow] = useState();
+  const [rowPerPage] = useState(() => {
+    const perPage = localStorage.getItem("row_per_page");
+    return perPage ? perPage : 10;
+  });
   const columns = [
     { title: "ID", field: "id", hidden: true },
     { title: "Username", field: "username", hiddenByColumnsButton: true },
@@ -22,13 +25,9 @@ function App() {
       });
   }, []);
 
-  const onSelectionChange = (selectedRows) => {
-    console.log(selectedRows);
+  const onChangeRowsPerPage = (page) => {
+    localStorage.setItem("row_per_page", page);
   };
-  const onRowClick = (e, clickedRow) => {
-    setSelectedRow(clickedRow);
-  };
-
   return (
     <div className="App">
       <h1 align="center">React-App</h1>
@@ -39,18 +38,11 @@ function App() {
         title="Employee Data"
         data={data}
         columns={columns}
-        onRowClick={onRowClick}
         options={{
-          //For multi select
-          // selection: true,
-          // showSelectAllCheckbox: false,
-          // showTextRowsSelected: false,
-          rowStyle: (row) =>
-            row?.id === selectedRow?.id ? { background: "#e7e7e7" } : {},
+          pageSize: rowPerPage,
         }}
-        onSelectionChange={onSelectionChange}
+        onChangeRowsPerPage={onChangeRowsPerPage}
       />
-      {selectedRow && <h4>Selected Employee Name : {selectedRow?.name}</h4>}
     </div>
   );
 }
